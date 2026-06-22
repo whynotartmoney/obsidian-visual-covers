@@ -1,0 +1,10 @@
+{
+  "id": "cd-cover-folder-visualizer",
+  "name": "CD-Cover Folder Visualizer",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "將 Obsidian 中的資料夾或 MOC 條列列表，轉化為美觀、具備黑膠懸停動畫的高質感 CD 封面牆視覺化工具（CD-Cover Folder Visualizer）。",
+  "author": "Obsidian Expert Designer",
+  "authorUrl": "https://ai.studio/build",
+  "isDesktopOnly": false
+}

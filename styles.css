@@ -1,0 +1,269 @@
+/* ==========================================================================
+   CD-Cover Folder Visualizer - Obsidian Plugin Styles
+   這是一個為 Obsidian 量身打造的高質感 CD 封面牆視覺化樣式表。
+   包含自適應響應網格、1:1 正比例、現代奢華多重漸層、黑膠唱片懸停滑出動畫特效。
+   ========================================================================== */
+
+/* 基礎容器配置 */
+.cd-cover-container {
+  width: 100%;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family: var(--font-interface, var(--font-sans, system-ui));
+}
+
+/* 控制列與標題 */
+.cd-cover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 1rem;
+}
+
+.cd-cover-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-normal);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cd-cover-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* RWD 響應式網格布局 */
+.cd-cover-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 2rem; /* 給予唱片滑出足夠的橫向安全空間 */
+  padding: 1rem 0;
+  width: 100%;
+}
+
+/* 封面卡片主體 (包含黑膠包裹層) */
+.cd-cover-wrapper {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  perspective: 1000px;
+}
+
+/* 核心正方形卡片 (CD 封面) */
+.cd-cover-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 
+              0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  cursor: pointer;
+  z-index: 2; /* 確保封面在黑膠唱片上方 */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 光澤/玻璃反光特效層 */
+.cd-cover-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 漸層主題彩虹預設值  */
+.cd-gradient-dreamy { background-image: linear-gradient(135deg, #8a2be2 0%, #ff1493 100%); }
+.cd-gradient-sunset { background-image: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); }
+.cd-gradient-synth { background-image: linear-gradient(135deg, #f012be 0%, #00ffff 100%); }
+.cd-gradient-cyber { background-image: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); }
+.cd-gradient-aurora { background-image: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); }
+.cd-gradient-emerald { background-image: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.cd-gradient-coral { background-image: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); }
+.cd-gradient-lavender { background-image: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+
+/* 封面圖片覆蓋 */
+.cd-cover-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* 精緻半透明毛玻璃標題區塊，確保文字與複雜背景對比度高 */
+.cd-cover-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.9rem 0.75rem;
+  background: rgba(15, 15, 15, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  transition: background-color 0.3s ease;
+}
+
+/* 唱片專輯標題 */
+.cd-cover-title-text {
+  color: #ffffff;
+  font-size: var(--cd-cover-font-size, 14px);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.cd-cover-subtitle-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: calc(var(--cd-cover-font-size, 14px) * 0.78);
+  margin: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-monospace, monospace);
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   【特色特效】黑膠唱片 (Vinyl Disc) 結構
+   ========================================================================== */
+.cd-cover-vinyl {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  /* 打造高真度黑膠聲軌紋路 */
+  background: repeating-radial-gradient(
+    circle,
+    #181818,
+    #111111 2px,
+    #1d1d1d 3px,
+    #0d0d0d 4px,
+    #1a1a1a 8px
+  );
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 
+              inset 0 0 1px rgba(255, 255, 255, 0.15);
+  z-index: 1; /* 起初隱藏在封面後方 */
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* 黑膠封套中心彩膠圓標 */
+.cd-cover-vinyl-center {
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+/* 黑膠軸心空洞 */
+.cd-cover-vinyl-spindle {
+  width: 14%;
+  height: 14%;
+  border-radius: 50%;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   懸停互動動畫 (Hover Interactions)
+   ========================================================================== */
+
+/* 1. 封面本身稍微縮放 & 陰影加深，模擬抽取 CD 夾 */
+.cd-cover-wrapper:hover .cd-cover-card {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.4), 
+              0 14px 18px -6px rgba(0, 0, 0, 0.3);
+}
+
+/* 2. 黑膠唱片滑出 48% 同時自轉，露出優美聲軌 */
+.cd-cover-wrapper.has-vinyl-animation:hover .cd-cover-vinyl {
+  /* 平滑滑出到卡片右側，並緩緩旋轉展現動態感 */
+  transform: translate(32%, 0) rotate(160deg);
+  z-index: 1; /* 保持在原卡片後方但顯現 */
+}
+
+/* 當用戶設定開啟 3D 電影級微晃特效時 */
+.cd-cover-wrapper.cd-hover-3d {
+  transform-style: preserve-3d;
+}
+
+/* 空白狀態 */
+.cd-cover-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  background: var(--background-secondary);
+  border: 2px dashed var(--background-modifier-border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  gap: 1rem;
+  text-align: center;
+}
+
+.cd-cover-empty-icon {
+  width: 48px;
+  height: 48px;
+  opacity: 0.5;
+  stroke-width: 1.5;
+}
+
+/* 嵌入 MOC markdown 模塊樣式額外修剪 */
+.markdown-rendered .cd-cover-container {
+  padding: 1rem 0;
+}

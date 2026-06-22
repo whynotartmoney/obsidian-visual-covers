@@ -1,0 +1,6 @@
+{
+  "name": "Visual Covers",
+  "description": "An Obsidian folder visualizer that renders notes as a beautiful grid-layout interactive CD cover wall, complete with customizable styles, gradients, textures, and custom image mappings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+/* Custom scrollbar to match Obsidian aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* CD-Cover Card Gradient Themes classes used in React */
+.cd-gradient-dreamy { background-image: linear-gradient(135deg, #8a2be2 0%, #ff1493 100%); }
+.cd-gradient-sunset { background-image: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); }
+.cd-gradient-synth { background-image: linear-gradient(135deg, #f012be 0%, #00ffff 100%); }
+.cd-gradient-cyber { background-image: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); }
+.cd-gradient-aurora { background-image: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); }
+.cd-gradient-emerald { background-image: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.cd-gradient-coral { background-image: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); }
+.cd-gradient-lavender { background-image: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+
+/* Spindle groove details */
+.vinyl-grooves {
+  background: repeating-radial-gradient(
+    circle,
+    #1f1f1f,
+    #111111 2px,
+    #2a2a2a 3px,
+    #0c0c0c 4px,
+    #222222 8px
+  );
+}
+
