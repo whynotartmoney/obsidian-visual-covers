@@ -28,3 +28,42 @@ Insert a `visual-covers` code block in any note to target and display a folder's
 
 ```cd-cover
 folder: "Projects/2026"
+
+2. Customizing Individual Covers (YAML Frontmatter)
+You can fine-tune the look of any individual note's cover card by adding custom configuration properties into that specific note's YAML Frontmatter:
+---
+cover-image: "assets/covers/album-art.jpg" # Can be a local vault path or https:// URL
+cover-gradient: "aurora"                   # Choose from preset gradient themes
+cover-font-size: "1.4rem"                  # Override global title text size
+cover-text-color: "#ffffff"               # Customize text color for contrast
+---
+
+🎨 Built-in Gradient Themes
+Don't have images for every note? No problem. Visual Covers comes with carefully curated, designer-approved gradient presets. Reference these names in your cover-gradient Frontmatter property:
+Preset Name	Color Vibe	Ideal For
+cyberpunk	Deep Purple \rightarrow Neon Pink	Creative projects, Tech logs
+aurora	Emerald Green \rightarrow Arctic Cyan	Daily journals, Nature notes
+sunset	Warm Orange \rightarrow Coral Red	Mood boards, Personal goals
+twilight	Deep Royal Blue \rightarrow Indigo	Heavy research, Archives
+minimal	Soft Silk Gray \rightarrow Muted Chalk	Clean, distraction-free vaults
+⚙️ Global Configuration
+Go to Obsidian Settings ‭$\rightarrow$‬ Visual Covers to tweak the default behaviors:
+•	Default Font Size: Sets the base typography scaling for all card text.
+•	Default Gradient Style: Pick the default color scheme for cards lacking custom images.
+•	Grid Card Min-Width: Controls how many columns fit on your screen before stacking.
+📦 Installation
+From the Obsidian Community Mall (Pending)
+	1.	Open Settings in Obsidian.
+	2.	Navigate to Community plugins ‭$\rightarrow$‬ Browse.
+	3.	Search for Visual Covers.
+	4.	Click Install, then Enable.
+Beta Testing via BRAT
+Want to test the latest bleeding-edge features?
+	1.	Install the BRAT plugin from the community market.
+	2.	In BRAT settings, click Add Beta plugin.
+	3.	Paste this repository URL: your-github-username/visual-covers
+	4.	Click Add Plugin and enable it under your core settings.
+🤝 Contributing & Feedback
+Got ideas to make this look even sleeker? Found a bug?
+Feel free to open an Issue or submit a Pull Request. All design-oriented suggestions are highly appreciated!
+License: MIT
