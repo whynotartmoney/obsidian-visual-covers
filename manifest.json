@@ -1,10 +1,10 @@
 {
-  "id": "cd-cover-folder-visualizer",
-  "name": "CD-Cover Folder Visualizer",
+  "id": "visual-covers",
+  "name": "Visual Covers",
   "version": "1.0.0",
   "minAppVersion": "1.4.0",
-  "description": "將 Obsidian 中的資料夾或 MOC 條列列表，轉化為美觀、具備黑膠懸停動畫的高質感 CD 封面牆視覺化工具（CD-Cover Folder Visualizer）。",
-  "author": "Obsidian Expert Designer",
+  "description": "Converts Obsidian text lists/folder notes into an incredibly aesthetic, highly customizable grid of aspect-ratio 1:1 CD covers with dynamic spinning Vinyl Record hover transitions.",
+  "author": "Obsidian Elite Developer",
   "authorUrl": "https://ai.studio/build",
   "isDesktopOnly": false
 }
