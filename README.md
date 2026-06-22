@@ -1,69 +1,116 @@
-# Visual Covers
+# Visual Covers 💿
 
-[![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=purple&label=downloads&query=%24%5B%2A%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)](https://obsidian.md/plugins)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/your-github-username/visual-covers?color=forestgreen)](https://github.com/your-github-username/visual-covers/releases)
-
-Transform your raw note lists and folder items into a stunning, interactive gallery of 1:1 aspect-ratio, CD/Vinyl-style visual covers. Say goodbye to boring text directories and give your Obsidian vault a gorgeous, designer-grade aesthetic facelift.
-
-![Visual Covers Showcase](https://raw.githubusercontent.com/your-github-username/visual-covers/main/images/showcase.gif) *(Optional: Replace with your actual screenshot/GIF URL later)*
+*An incredibly aesthetic, highly customizable grid-based folder visualizer for Obsidian. Convert your raw note directories and text lists into stunning 1:1 aspect-ratio interactive vinyl CD covers with smooth, realistic spinning animations.*
 
 ---
 
 ## ✨ Features
 
-- **💿 1:1 CD/Vinyl Aesthetic**: Renders folder contents into a clean, modern, responsive CSS Grid layout.
-- **🎨 Dynamic Gradients**: Automatically generates sleek, multi-tone gradients as default backdrops.
-- **🖼️ Custom Artwork**: Overlay any cover with local vault images or online URLs via YAML Frontmatter.
-- **✍️ Tailored Typography**: Adjust global or per-note title font sizes dynamically to fit long names perfectly.
-- **✨ Smooth Interactions**: Responsive hover effects featuring elegant scale-ups, flowing gradients, and floating shadows.
+- 📁 **Automated Folder grids**: Renders your specified vault folder notes as professional grid layouts with customizable columns.
+- 💿 **Dynamic Vinyl Record Animations**: Hover over any CD cover to watch an analog black vinyl record slide out smoothly and spin in real-time.
+- 🎨 **Fallback Gradient Themes**: 8 exquisite high-contrast CSS gradient presets (Dreamy Purple, Sunset Warmth, Synthwave Cyan, Midnight Cyber, Aurora Sky, Mint Emerald, Crimson Stage, and Soft Lavender) that automatically activate when no cover thumbnail image is loaded.
+- 🖼️ **Flexible Frontmatter Cover Mapping**: Instantly display customized images by mapping standard external links (such as Unsplash) or local attachments via simple YAML frontmatter.
+- 🎛️ **Obsidian Native Setting Panel**: Fine-tune grid header text sizes, enable or disable 3D case tilt effects, toggle vinyl record hover physics, and filter out non-markdown notes easily.
 
 ---
 
-## 🚀 How to Use
+## 🚀 How to Use in Obsidian
 
-`Visual Covers` can render your notes using two methods: **Folder View** (via the sidebar/tab view) or by embedding a dynamic query block using standard markdown code blocks.
+`Visual Covers` parses your notes' YAML frontmatter at the top of each `.md` file to generate the cover title, subtitle, fallback gradient, and custom thumbnail image.
 
-### 1. Code Block Method (Recommended)
-Insert a `visual-covers` code block in any note to target and display a folder's content as a grid:
+### 1. Configure note frontmatter
 
-```cd-cover
-folder: "Projects/2026"
+Add a simple frontmatter block to the top of any note inside your target folder:
 
-2. Customizing Individual Covers (YAML Frontmatter)
-You can fine-tune the look of any individual note's cover card by adding custom configuration properties into that specific note's YAML Frontmatter:
+```yaml
 ---
-cover-image: "assets/covers/album-art.jpg" # Can be a local vault path or https:// URL
-cover-gradient: "aurora"                   # Choose from preset gradient themes
-cover-font-size: "1.4rem"                  # Override global title text size
-cover-text-color: "#ffffff"               # Customize text color for contrast
+title: "The Dark Side of the Moon"
+subtitle: "Pink Floyd — Psychedelic Rock"
+gradient: "cyber"
+cover: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=600"
 ---
 
-🎨 Built-in Gradient Themes
-Don't have images for every note? No problem. Visual Covers comes with carefully curated, designer-approved gradient presets. Reference these names in your cover-gradient Frontmatter property:
-Preset Name	Color Vibe	Ideal For
-cyberpunk	Deep Purple \rightarrow Neon Pink	Creative projects, Tech logs
-aurora	Emerald Green \rightarrow Arctic Cyan	Daily journals, Nature notes
-sunset	Warm Orange \rightarrow Coral Red	Mood boards, Personal goals
-twilight	Deep Royal Blue \rightarrow Indigo	Heavy research, Archives
-minimal	Soft Silk Gray \rightarrow Muted Chalk	Clean, distraction-free vaults
-⚙️ Global Configuration
-Go to Obsidian Settings ‭$\rightarrow$‬ Visual Covers to tweak the default behaviors:
-•	Default Font Size: Sets the base typography scaling for all card text.
-•	Default Gradient Style: Pick the default color scheme for cards lacking custom images.
-•	Grid Card Min-Width: Controls how many columns fit on your screen before stacking.
-📦 Installation
-From the Obsidian Community Mall (Pending)
-	1.	Open Settings in Obsidian.
-	2.	Navigate to Community plugins ‭$\rightarrow$‬ Browse.
-	3.	Search for Visual Covers.
-	4.	Click Install, then Enable.
-Beta Testing via BRAT
-Want to test the latest bleeding-edge features?
-	1.	Install the BRAT plugin from the community market.
-	2.	In BRAT settings, click Add Beta plugin.
-	3.	Paste this repository URL: your-github-username/visual-covers
-	4.	Click Add Plugin and enable it under your core settings.
-🤝 Contributing & Feedback
-Got ideas to make this look even sleeker? Found a bug?
-Feel free to open an Issue or submit a Pull Request. All design-oriented suggestions are highly appreciated!
-License: MIT
+# Album Review: The Dark Side of the Moon
+Write your review, track rankings, memories, or metadata down here in Obsidian's standard markdown layout.
+```
+
+### 2. Available Frontmatter Attributes
+
+| YAML Property | Expected Value | Description |
+| :--- | :--- | :--- |
+| `title` | `String` | The primary bold title displayed on the CD cover's lower label (defaults to note name). |
+| `subtitle` | `String` | A secondary metadata subtitle printed below the title (perfect for genre, artist, or rating). |
+| `gradient` | `dreamy` \| `sunset` \| `synth` \| `cyber` \| `aurora` \| `emerald` \| `coral` \| `lavender` | The color theme applied to the CD backing if no custom cover photo is selected. |
+| `cover` | `URL` \| `Local Image Path` | Direct hyperlinked URL or internal vault reference to render as the 1:1 cover background. |
+
+---
+
+## 🛠️ Installation
+
+### Method 1: BRAT (Beta Reviewer's Auto-update Tool) — Recommended for Testers
+1. Ensure you have the **BRAT** plugin installed from Obsidian's official Community Plugins directory.
+2. Open Obsidian settings and navigate to **BRAT**.
+3. Click **Add Beta plugin**.
+4. Input your GitHub repository link: `your-github-username/obsidian-visual-covers`.
+5. Enable `Visual Covers` under Community Plugins toggle!
+
+### Method 2: Manual Installation
+1. Go to the [Releases](https://github.com/your-github-username/obsidian-visual-covers/releases) page of your GitHub repository.
+2. Download the three core release files: `main.js`, `manifest.json`, and `styles.css`.
+3. Locate your Obsidian Vault folder, enable hidden folders, and navigate to:
+   ```bash
+   <your-vault-root>/.obsidian/plugins/
+   ```
+4. Create a folder named exactly `visual-covers` and paste the three downloaded files inside.
+5. Restart Obsidian, load your settings panel, navigate to **Community plugins**, and enable **Visual Covers**.
+
+---
+
+## 📦 For Obsidian Reviewers & Developers
+
+### 🏗️ Compiling Locally
+To modify, build, or contribute to `Visual Covers`, follow these instructions:
+
+1. Clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/your-github-username/obsidian-visual-covers.git
+   cd obsidian-visual-covers
+   ```
+2. Install the developer dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development watch server:
+   ```bash
+   npm run dev
+   ```
+4. Build the final optimized bundle for production:
+   ```bash
+   npm run build
+   ```
+   *(This outputs the compiled and bundled `main.js` and `styles.css` along with the necessary `manifest.json` configurations for release).*
+
+---
+
+## 🤝 Submitting to the Obsidian Community List
+
+Below is the entry schema ready to be added to the official `community-plugins.json` index inside the `obsidianmd/obsidian-releases` repository:
+
+```json
+{
+  "id": "visual-covers",
+  "name": "Visual Covers",
+  "author": "Your Name",
+  "description": "Transforms your folder notes and markdown vaults into a beautiful, interactive 1:1 CD and Vinyl record covers wall.",
+  "repo": "your-github-username/obsidian-visual-covers"
+}
+```
+
+---
+
+## 📄 License & Integrity
+This plugin is licensed under the [MIT License](LICENSE). There is absolutely no external telemetry, unauthorized collection of private vault notes, or persistent backend queries. Your thoughts stay entirely local and secure.
+
+---
+
+*Crafted with 💜 for digital archivists, vinyl collectors, and aesthetic journalers.*
