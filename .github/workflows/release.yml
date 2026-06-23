@@ -1,0 +1,44 @@
+name: Release Obsidian Plugin
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Obsidian Plugin
+        run: npm run build:plugin
+
+      - name: Prepare Release Artifacts
+        run: |
+          mkdir -p build-release
+          cp main.js build-release/main.js
+          cp manifest.json build-release/manifest.json
+          cp styles.css build-release/styles.css
+
+      - name: Release Plugin Assets
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            build-release/main.js
+            build-release/manifest.json
+            build-release/styles.css
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

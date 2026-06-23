@@ -46,6 +46,7 @@ interface MockNote {
     subtitle?: string;
     cover?: string;
     gradient?: string;
+    fontSize?: number;
   };
   stat: {
     size: number; // in bytes
@@ -61,16 +62,15 @@ interface PluginSettings {
   customCovers: Record<string, string>;
 }
 
-// Pre-curated high-quality Unsplash music photography presets
+// Pre-curated high-quality 2D digital graphic art presets
 const COVER_PRESETS = [
-  { name: "Neon Synth Horizon", url: "https://images.unsplash.com/photo-1515462277126-270d878326e5?q=80&w=600&auto=format&fit=crop" },
-  { name: "Star Dust Ambient", url: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=600&auto=format&fit=crop" },
-  { name: "Piano Candle Lounge", url: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=600&auto=format&fit=crop" },
-  { name: "Hard Rock Overdrive", url: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=600&auto=format&fit=crop" },
-  { name: "Cyber Tokyo Glow", url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop" },
-  { name: "Vienna Classical Symphony", url: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=600&auto=format&fit=crop" },
-  { name: "Sea Foam Acoustic", url: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=600&auto=format&fit=crop" },
-  { name: "Pacific Summer Vibes", url: "https://images.unsplash.com/photo-1494253109108-2e30c049369b?q=80&w=600&auto=format&fit=crop" },
+  { name: "2D Memphis Abstract Shapes", url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop" },
+  { name: "2D Bauhaus Color Blocks", url: "https://images.unsplash.com/photo-1502691876148-a84978e59fa8?q=80&w=600&auto=format&fit=crop" },
+  { name: "2D Geometric Minimalist Art", url: "https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=600&auto=format&fit=crop" },
+  { name: "2D Fluid Neon Cyber Design", url: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=600&auto=format&fit=crop" },
+  { name: "2D Aesthetic Matisse Painting", url: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?q=80&w=600&auto=format&fit=crop" },
+  { name: "2D Retro Wave Liquid Graphic", url: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=600&auto=format&fit=crop" },
+  { name: "2D Pastel Marble Texture Lines", url: "https://images.unsplash.com/photo-1557672172-298e090bd0f1?q=80&w=600&auto=format&fit=crop" },
 ];
 
 const INITIAL_NOTES: MockNote[] = [
@@ -304,6 +304,8 @@ export default function App() {
   const [selectedFolder, setSelectedFolder] = useState<string>("Rock Classics");
   const [selectedNote, setSelectedNote] = useState<MockNote | null>(INITIAL_NOTES[1]); // Led Zeppelin IV
   const [activeCodeTab, setActiveCodeTab] = useState<"manifest.json" | "main.ts" | "styles.css">("main.ts");
+  const [isFrontmatterOpen, setIsFrontmatterOpen] = useState<boolean>(false);
+  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState<boolean>(true);
   
   // Tab Management
   const [mainTab, setMainTab] = useState<"workspace" | "publishing">("workspace");
@@ -316,16 +318,8 @@ export default function App() {
   const [savedSuccessMsg, setSavedSuccessMsg] = useState<boolean>(false);
   const [copiedFile, setCopiedFile] = useState<string | null>(null);
 
-  // Creative Generator (AI Assistant Simulation)
-  const [aiPrompt, setAiPrompt] = useState<string>("");
-  const [isGeneratingCover, setIsGeneratingCover] = useState<boolean>(false);
-  const [aiCoverResult, setAiCoverResult] = useState<{
-    title: string;
-    subtitle: string;
-    gradient: string;
-    coverUrl: string;
-    vibeDescription: string;
-  } | null>(null);
+  // Ref for custom local file uploader
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Sync to Storage
   useEffect(() => {
@@ -381,7 +375,8 @@ export default function App() {
             title: parsedFm.title || n.name,
             subtitle: parsedFm.subtitle || "",
             cover: parsedFm.cover || parsedFm.image || "",
-            gradient: parsedFm.gradient || "dreamy"
+            gradient: parsedFm.gradient || "dreamy",
+            fontSize: parsedFm.fontSize ? parseInt(parsedFm.fontSize) : (parsedFm.font_size ? parseInt(parsedFm.font_size) : undefined)
           },
           stat: {
             size: newContent.length
@@ -526,75 +521,18 @@ Establish your gorgeous CD-Cover Grid layout for categorized documents!
   };
 
   // AI Creator simulation
-  const handleGenerateCreativeCover = () => {
-    if (!aiPrompt.trim()) return;
-    setIsGeneratingCover(true);
-    setAiCoverResult(null);
+  const handleCustomImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    // Dynamic mock prompt analysis
-    setTimeout(() => {
-      const q = aiPrompt.toLowerCase();
-      let title = "Starlight Sonata";
-      let subtitle = "Dreamy Lo-fi / Slow Keys";
-      let gradient = "dreamy";
-      let coverUrl = "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=600&auto=format&fit=crop";
-      let description = "Designed with soft stardust textures & glowing nebula layers. Evokes calming nighttime energy.";
-
-      if (q.includes("cyber") || q.includes("synth") || q.includes("neon") || q.includes("electronic")) {
-        title = "Metropolitan Neon (Grid Mix)";
-        subtitle = "Cyberpunk / Fast Analog Synth";
-        gradient = "synth";
-        coverUrl = "https://images.unsplash.com/photo-1515462277126-270d878326e5?q=80&w=600&auto=format&fit=crop";
-        description = "A sharp, dynamic theme inspired by late-night Tokyo street grids and highway headlights.";
-      } else if (q.includes("jazz") || q.includes("acoustic") || q.includes("cafe") || q.includes("piano")) {
-        title = "Blue Boulevard";
-        subtitle = "Vintage Cafe Jazz / Mellow Bass";
-        gradient = "lavender";
-        coverUrl = "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=600&auto=format&fit=crop";
-        description = "Classic smoky jazz club vibe paired with relaxing lavender reflections & retro vinyl grooves.";
-      } else if (q.includes("nature") || q.includes("rain") || q.includes("sea") || q.includes("chill")) {
-        title = "Emerald Forest Mist";
-        subtitle = "Ambient White Noise / Calming Whistles";
-        gradient = "emerald";
-        coverUrl = "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?q=80&w=600&auto=format&fit=crop";
-        description = "A refreshing theme with cool rainforest mist and slow organic waveforms for ultimate peace.";
-      } else if (q.includes("rock") || q.includes("heavy") || q.includes("guitar")) {
-        title = "Redline Redux";
-        subtitle = "Distorted Guitars & Overdriven Bass";
-        gradient = "coral";
-        coverUrl = "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=600&auto=format&fit=crop";
-        description = "A fiery red-hot visual setup mimicking heavy stage glare, Marshall stacks, and concert power.";
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Url = event.target?.result as string;
+      if (base64Url) {
+        handleAssignCoverUrl(base64Url);
       }
-
-      setAiCoverResult({ title, subtitle, gradient, coverUrl, vibeDescription: description });
-      setIsGeneratingCover(false);
-    }, 1200);
-  };
-
-  const applyAICoverToCurrentNote = () => {
-    if (!aiCoverResult || !selectedNote) return;
-
-    const rebuiltContent = `---
-title: "${aiCoverResult.title}"
-subtitle: "${aiCoverResult.subtitle}"
-gradient: "${aiCoverResult.gradient}"
-cover: "${aiCoverResult.coverUrl}"
----
-
-# ${aiCoverResult.title}
-*Custom cover generated based on: "${aiPrompt}"*
-
-### Custom Description:
-${aiCoverResult.vibeDescription}
-
-### Tracklist:
-1. ${aiCoverResult.title} (Live Mix)
-2. Retro Reflections
-3. Echoing Chambers
-`;
-    handleUpdateNoteContent(rebuiltContent);
-    setAiCoverResult(null);
-    setAiPrompt("");
+    };
+    reader.readAsDataURL(file);
   };
 
   const renderFolderCDWall = (folderPath: string) => {
@@ -614,7 +552,7 @@ ${aiCoverResult.vibeDescription}
     if (folderNotes.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500">
-          <Disc className="w-10 h-10 text-gray-600 stroke-1 mb-3 animate-pulse" />
+          <BookOpen className="w-10 h-10 text-gray-600 stroke-1 mb-3 animate-pulse" />
           <p className="text-xs">This folder is currently empty.</p>
           <button
             type="button"
@@ -628,52 +566,24 @@ ${aiCoverResult.vibeDescription}
     }
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-2">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 ${isFrontmatterOpen ? "lg:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4"} gap-6 py-2`}>
         {folderNotes.map((note) => {
           const isSelected = selectedNote?.path === note.path;
-          const isHovered = hoveredNotePath === note.path;
           const gradientClass = gradientMap[note.frontmatter.gradient || "dreamy"] || "from-pink-500 to-purple-500";
           const coverImg = note.frontmatter.cover;
 
           return (
             <div
               key={note.path}
-              onMouseEnter={() => setHoveredNotePath(note.path)}
-              onMouseLeave={() => setHoveredNotePath(null)}
               onClick={() => handleSelectNote(note)}
               className="relative cursor-pointer group"
-              style={{ perspective: "1000px" }}
             >
-              {/* Vinyl Disc - slides out on hover */}
+              {/* Album Cover Main Card */}
               <div
-                className={`absolute inset-y-1 right-2 w-32 rounded-full bg-neutral-900 flex items-center justify-center border-4 border-neutral-950 shadow-2xl transition-all duration-500 ease-out z-0 ${
-                  settings.enableVinylAnimation && isHovered
-                    ? "translate-x-12 rotate-[180deg]"
-                    : "translate-x-0 rotate-0 pointer-events-none opacity-45"
-                }`}
-              >
-                {/* Vinyl Record groove lines */}
-                <div className="absolute inset-2 rounded-full border border-neutral-800/40 opacity-70" />
-                <div className="absolute inset-4 rounded-full border border-neutral-800/40 opacity-50" />
-                <div className="absolute inset-6 rounded-full border border-neutral-800/40 opacity-40" />
-                <div className="absolute inset-8 rounded-full border border-neutral-800/40 opacity-30" />
-                
-                {/* Disc Center Label */}
-                <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${gradientClass} flex items-center justify-center text-[6px] text-white font-mono font-bold overflow-hidden p-1 text-center leading-none`}>
-                  <div className="w-1.5 h-1.5 rounded-full bg-black/80" />
-                </div>
-              </div>
-
-              {/* Album CD Cover Main Card */}
-              <div
-                className={`relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-tr ${gradientClass} border transition-all duration-300 z-10 shadow-lg ${
+                className={`relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-tr ${gradientClass} border transition-all duration-150 ease-out shadow-lg group-hover:scale-[1.02] ${
                   isSelected 
-                    ? "ring-2 ring-purple-500 border-white" 
-                    : "border-white/10 group-hover:border-white/30"
-                } ${
-                  settings.enable3DEffect && isHovered 
-                    ? "-translate-y-1.5 rotate-1 shadow-2xl shadow-purple-950/20" 
-                    : ""
+                    ? "ring-2 ring-purple-500 border-white shadow-purple-500/10" 
+                    : "border-white/10 group-hover:border-white/30 group-hover:shadow-xl"
                 }`}
                 style={{
                   backgroundImage: coverImg ? `url(${coverImg})` : undefined,
@@ -681,20 +591,21 @@ ${aiCoverResult.vibeDescription}
                   backgroundPosition: "center"
                 }}
               >
-                {/* Realistic CD Case Plastic Shine overlay line */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-black/30 pointer-events-none z-20" />
-                <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-r from-transparent to-white/[0.04] transform -skew-x-12 opacity-80 pointer-events-none z-20" />
+                {/* Visual Glass Shine Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-black/20 pointer-events-none z-10" />
 
-                {/* Cover info bottom rail */}
-                <div className="absolute bottom-0 inset-x-0 p-3 bg-black/60 backdrop-blur-md border-t border-white/10 flex flex-col gap-0.5 z-20">
+                {/* Cover info full face typographic layout */}
+                <div className="absolute inset-0 p-5 flex flex-col items-start justify-center text-left z-20 gap-1 select-none animate-[fadeIn_0.2s_ease-out]">
                   <span 
-                    className="font-bold text-white tracking-tight truncate block"
-                    style={{ fontSize: `${settings.defaultFontSize}px` }}
+                    className="font-extrabold text-white tracking-tight text-left max-w-full overflow-hidden"
+                    style={{ 
+                      fontSize: `${note.frontmatter.fontSize || settings.defaultFontSize}px`,
+                      textShadow: "0 2px 5px rgba(0,0,0,0.45)",
+                      lineHeight: 1.1,
+                      wordBreak: "break-word"
+                    }}
                   >
                     {note.frontmatter.title || note.name}
-                  </span>
-                  <span className="text-[10px] text-gray-300 font-mono tracking-wider truncate block">
-                    {note.frontmatter.subtitle || "Acoustic Track"}
                   </span>
                 </div>
               </div>
@@ -730,7 +641,7 @@ ${aiCoverResult.vibeDescription}
 
 .cd-cover-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
   gap: 2.2rem;
   padding: 1rem 0;
   width: 100%;
@@ -806,23 +717,65 @@ ${aiCoverResult.vibeDescription}
   font-family: monospace;
 }
 
-/* Vinyl Disc spinning out effects */
-.cd-cover-vinyl {
-  position: absolute;
-  inset: 5%;
-  border-radius: 50%;
-  background: repeating-radial-gradient(circle, #181818, #111111 2px, #1c1c1c 3px, #0e0e0e 4px, #1a1a1a 8px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  z-index: 1;
-  transition: transform 0.5s ease, left 0.5s ease;
+/* Fast, lag-free premium hover animations */
+.cd-cover-card {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease-out;
 }
 
 .cd-cover-wrapper:hover .cd-cover-card {
-  transform: translateY(-4px) scale(1.02);
+  transform: scale(1.02);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.45);
+}
+
+/* Elegant High-Fidelity Vinyl Disc Styles */
+.cd-cover-vinyl {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle,
+    #181818,
+    #101010 1px,
+    #1e1e1e 2px,
+    #101010 3px
+  );
+  box-shadow: 
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    inset 0 0 10px rgba(0, 0, 0, 0.8);
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), z-index 0.6s;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cd-cover-vinyl-center {
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.cd-cover-vinyl-spindle {
+  width: 14%;
+  height: 14%;
+  border-radius: 50%;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .cd-cover-wrapper:hover .cd-cover-vinyl {
-  transform: translate(32%, 0) rotate(160deg);
+  transform: translate(35%, 0) rotate(360deg);
   z-index: 1;
 }
 
@@ -848,7 +801,7 @@ interface CDCoverSettings {
 }
 
 const DEFAULT_SETTINGS: CDCoverSettings = {
-  defaultFontSize: 13,
+  defaultFontSize: 14,
   defaultGradient: "dreamy",
   enableVinylAnimation: true,
   enable3DEffect: true,
@@ -860,7 +813,7 @@ const VIEW_TYPE = "visual-covers-view";
 
 class CDCoverView extends ItemView {
   plugin: VisualCoversPlugin;
-  folderPath: string = "";
+  folderPath: string = "/";
 
   constructor(leaf: WorkspaceLeaf, plugin: VisualCoversPlugin) {
     super(leaf);
@@ -880,34 +833,178 @@ class CDCoverView extends ItemView {
     const root = this.contentEl;
     root.empty();
 
-    const container = root.createDiv({ cls: "cd-cover-container" });
-    const gridEl = container.createDiv({ cls: "cd-cover-grid" });
+    const container = root.createDiv({ cls: "cd-cover-container animate-fade-in" });
+
+    // Header structure inside Obsidian with Folder Selector dropdown
+    const headerEl = container.createDiv({ 
+      cls: "cd-cover-header", 
+      style: "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;" 
+    });
+    headerEl.createEl("h3", { text: "Visual Covers Grid Focus", style: "margin: 0; font-size: 1.1em;" });
+
+    const folderSelect = headerEl.createEl("select", { 
+      cls: "cd-cover-folder-select",
+      style: "background: var(--background-secondary); border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 6px; color: var(--text-normal); font-size: 12px; cursor: pointer;"
+    });
+
+    // Populate all vault folders
+    const allFiles = this.app.vault.getAllLoadedFiles();
+    const folders = allFiles.filter(f => f instanceof TFolder) as TFolder[];
     
-    // Set custom CSS variables
-    gridEl.style.setProperty("--cd-cover-font-size", \`\${this.plugin.settings.defaultFontSize}px\`);
+    // Root option
+    const rootOpt = folderSelect.createEl("option", { text: "Root Vault" });
+    rootOpt.value = "/";
+    if (this.folderPath === "/") rootOpt.selected = true;
 
-    const folder = this.app.vault.getAbstractFileByPath(this.folderPath);
-    if (!(folder instanceof TFolder)) return;
-
-    folder.children.forEach(file => {
-      if (file instanceof TFile) {
-        if (this.plugin.settings.filterMarkdownOnly && file.extension !== "md") return;
-
-        const wrapper = gridEl.createDiv({ cls: "cd-cover-wrapper" });
-        const card = wrapper.createDiv({ cls: "cd-cover-card cd-gradient-dreamy" });
-        
-        const info = card.createDiv({ cls: "cd-cover-info" });
-        info.createDiv({ cls: "cd-cover-title-text", text: file.basename });
-        info.createDiv({ cls: "cd-cover-subtitle-text", text: "LOCAL NOTE" });
-
-        // Spin disk vinyl components
-        const vinyl = wrapper.createDiv({ cls: "cd-cover-vinyl" });
-
-        card.addEventListener("click", () => {
-          this.app.workspace.getLeaf(false).openFile(file);
-        });
+    folders.forEach(f => {
+      if (f.path === "/" || f.path === "") return;
+      const opt = folderSelect.createEl("option", { text: f.path });
+      opt.value = f.path;
+      if (this.folderPath === f.path) {
+        opt.selected = true;
       }
     });
+
+    folderSelect.addEventListener("change", (e) => {
+      const target = e.target as HTMLSelectElement;
+      this.setFolder(target.value);
+    });
+
+    const gridEl = container.createDiv({ cls: "cd-cover-grid" });
+    
+    // Set customized layout font sizing variables
+    gridEl.style.setProperty("--cd-cover-font-size", \`\${this.plugin.settings.defaultFontSize}px\`);
+
+    // Fetch the parsed folder or root listing
+    let filesInFolder: TFile[] = [];
+    if (this.folderPath === "/") {
+      const allVaultFiles = this.app.vault.getFiles();
+      filesInFolder = allVaultFiles;
+    } else {
+      const folderObj = this.app.vault.getAbstractFileByPath(this.folderPath);
+      if (folderObj instanceof TFolder) {
+        filesInFolder = folderObj.children.filter(f => f instanceof TFile) as TFile[];
+      }
+    }
+
+    filesInFolder.forEach(file => {
+      // Filter out non-markdown references if settings demand
+      if (this.plugin.settings.filterMarkdownOnly && file.extension !== "md") return;
+
+      // Extract high fidelity frontmatter properties
+      const cache = this.app.metadataCache.getFileCache(file);
+      const frontmatter = cache?.frontmatter || {};
+
+      const title = frontmatter.title || file.basename;
+      const gradient = frontmatter.gradient || this.plugin.settings.defaultGradient;
+      const cover = frontmatter.cover || "";
+      const fontSize = frontmatter.fontSize || this.plugin.settings.defaultFontSize;
+
+      const wrapper = gridEl.createDiv({ cls: "cd-cover-wrapper" });
+
+      // 1. High fidelity spinning Vinyl disk
+      if (this.plugin.settings.enableVinylAnimation) {
+        const vinyl = wrapper.createDiv({ cls: "cd-cover-vinyl" });
+        const center = vinyl.createDiv({ cls: "cd-cover-vinyl-center" });
+        vinyl.createDiv({ cls: "cd-cover-vinyl-spindle" });
+        if (cover) {
+          center.style.backgroundImage = \`url("\${cover}")\`;
+        }
+      }
+
+      // 2. Front cover artwork card
+      const card = wrapper.createDiv({ cls: \`cd-cover-card cd-gradient-\${gradient}\` });
+      if (cover) {
+        card.style.backgroundImage = \`url("\${cover}")\`;
+      }
+      if (fontSize) {
+        card.style.setProperty("--cd-cover-font-size", \`\${fontSize}px\`);
+      }
+
+      // Glowing reflection shine
+      card.createDiv({ 
+        cls: "cd-cover-shine", 
+        style: "position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%); pointer-events: none; z-index: 3;" 
+      });
+
+      // Details overlay area
+      const info = card.createDiv({ cls: "cd-cover-info" });
+      info.createDiv({ cls: "cd-cover-title-text", text: title });
+      info.createDiv({ cls: "cd-cover-subtitle-text", text: file.name.toUpperCase() });
+
+      // Click event block to open Obsidian note file instantly
+      card.addEventListener("click", () => {
+        this.app.workspace.getLeaf(false).openFile(file);
+      });
+    });
+  }
+}
+
+class CDCoverSettingTab extends PluginSettingTab {
+  plugin: VisualCoversPlugin;
+
+  constructor(app: App, plugin: VisualCoversPlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+
+  display(): void {
+    const { containerEl } = this;
+    containerEl.empty();
+    containerEl.createEl("h2", { text: "Visual Covers Grid settings" });
+
+    new Setting(containerEl)
+      .setName("Default Frontmatter Font Size")
+      .setDesc("The font size sizing parameter applied on card labels (in pixels)")
+      .addSlider(slider => slider
+        .setLimits(10, 48, 1)
+        .setValue(this.plugin.settings.defaultFontSize)
+        .onChange(async (value) => {
+          this.plugin.settings.defaultFontSize = value;
+          await this.plugin.saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName("Default Card Gradient")
+      .setDesc("When no custom cover artwork URL is configured, this gradient applies")
+      .addDropdown(dropdown => dropdown
+        .addOption("dreamy", "Dreamy Purple")
+        .addOption("sunset", "Sunset Glow")
+        .addOption("synth", "Synthwave Neon")
+        .addOption("cyber", "Cyberpunk Steel")
+        .addOption("aurora", "Aurora Borealis")
+        .addOption("emerald", "Emerald Forest")
+        .addOption("coral", "Vibrant Coral")
+        .addOption("lavender", "Cool Lavender")
+        .setValue(this.plugin.settings.defaultGradient)
+        .onChange(async (value) => {
+          this.plugin.settings.defaultGradient = value;
+          await this.plugin.saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName("Spinning Vinyl Record Animation")
+      .setDesc("Slide outward the rotating Vinyl Record on cover hovering")
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.enableVinylAnimation)
+        .onChange(async (value) => {
+          this.plugin.settings.enableVinylAnimation = value;
+          await this.plugin.saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName("Filter Markdown Notes Only")
+      .setDesc("Hide non-markdown assets and attachment files from the grid")
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.filterMarkdownOnly)
+        .onChange(async (value) => {
+          this.plugin.settings.filterMarkdownOnly = value;
+          await this.plugin.saveSettings();
+        })
+      );
   }
 }
 
@@ -916,8 +1013,39 @@ export default class VisualCoversPlugin extends Plugin {
 
   async onload() {
     await this.loadSettings();
+
+    // Register active workspace view
     this.registerView(VIEW_TYPE, (leaf) => new CDCoverView(leaf, this));
+
+    // Register ribbon button icon
+    this.addRibbonIcon("disc", "Open Visual Covers Grid", () => {
+      this.activateView();
+    });
+
+    // Register command palette entry
+    this.addCommand({
+      id: "open-visual-covers-palette",
+      name: "Open Visual Covers Grid View",
+      callback: () => this.activateView(),
+    });
+
+    // Add settings tab panel
     this.addSettingTab(new CDCoverSettingTab(this.app, this));
+  }
+
+  async activateView() {
+    const { workspace } = this.app;
+    let leaf = workspace.getLeavesOfType(VIEW_TYPE)[0];
+    if (!leaf) {
+      const rightLeaf = workspace.getRightLeaf(false);
+      if (rightLeaf) {
+        leaf = rightLeaf;
+        await leaf.setViewState({ type: VIEW_TYPE, active: true });
+      }
+    }
+    if (leaf) {
+      workspace.revealLeaf(leaf);
+    }
   }
 
   async loadSettings() {
@@ -926,6 +1054,10 @@ export default class VisualCoversPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+
+  onunload() {
+    this.app.workspace.detachLeavesOfType(VIEW_TYPE);
   }
 }`;
 
@@ -943,7 +1075,6 @@ export default class VisualCoversPlugin extends Plugin {
               <h1 className="text-md md:text-lg font-bold font-display tracking-tight text-white">Visual Covers</h1>
               <span className="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/20 font-medium font-mono">Sim v1.0</span>
             </div>
-            <p className="text-xs text-gray-400">Transform raw markdown files & folder pathways into high-fidelity music vinyl CD cover walls</p>
           </div>
         </div>
 
@@ -989,7 +1120,8 @@ export default class VisualCoversPlugin extends Plugin {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
             {/* 1. Left Side Column: Vault Files & Categories Folder structure */}
-            <div className="lg:col-span-3 bg-[#111111] border border-[#222222] rounded-2xl p-4 flex flex-col min-h-[500px]">
+            {isLeftSidebarOpen && (
+              <div className="lg:col-span-3 bg-[#111111] border border-[#222222] rounded-2xl p-4 flex flex-col min-h-[500px]">
               <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
                 <span className="text-[10px] font-bold tracking-widest text-gray-400 flex items-center gap-1">
                   <BookOpen className="w-3.5 h-3.5 text-purple-400" />
@@ -1105,33 +1237,60 @@ export default class VisualCoversPlugin extends Plugin {
                 </div>
               </div>
             </div>
+          )}
 
             {/* 2. Middle Column: Responsive Square Card GRID view (Live Plugin Preview) */}
-            <div className="lg:col-span-6 bg-[#141414] border border-[#222222] rounded-2xl p-5 flex flex-col min-h-[500px]">
+            <div className={`${
+              isLeftSidebarOpen && isFrontmatterOpen 
+                ? "lg:col-span-6" 
+                : isLeftSidebarOpen || isFrontmatterOpen 
+                ? "lg:col-span-9" 
+                : "lg:col-span-12"
+            } bg-[#141414] border border-[#222222] rounded-2xl p-5 flex flex-col min-h-[500px] transition-all duration-300`}>
               
               {/* Plugin Header with controls */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#222222] pb-3 mb-4 gap-2">
                 <div>
                   <h2 className="text-sm font-bold text-white flex items-center gap-1.5">
                     <Grid className="w-4 h-4 text-purple-400" />
-                    CD-Cover Wall View
+                    Cover Wall View
                   </h2>
                   <p className="text-xs text-gray-400 mt-0.5">Renders selected directory contents synchronously</p>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-gray-500">Font:</span>
-                  <span className="bg-[#1c1c1c] px-2 py-1 rounded text-purple-300 font-mono text-[10px] border border-white/5">
-                    {settings.defaultFontSize}px
-                  </span>
+                  <div className="flex items-center gap-2 self-end sm:self-center">
+                    {/* Left Sidebar Collapse UI Icon Button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}
+                      title={isLeftSidebarOpen ? "Collapse Vault Sidebar" : "Expand Vault Sidebar"}
+                      className={`p-2 rounded-xl border transition-all flex items-center justify-center cursor-pointer ${
+                        isLeftSidebarOpen
+                          ? "bg-purple-600/20 text-purple-300 border-purple-500/40"
+                          : "bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      <BookOpen className="w-4 h-4" />
+                    </button>
 
-                  <span className="h-4 w-px bg-white/10" />
+                    <span className="h-4 w-px bg-white/10 mx-1" />
 
-                  <span className="text-gray-500">3D Tilt:</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${settings.enable3DEffect ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-gray-400"}`}>
-                    {settings.enable3DEffect ? "ON" : "OFF"}
-                  </span>
-                </div>
+                    {/* Frontmatter Editor Sidebar Icon Button selector */}
+                    {selectedNote && (
+                      <button
+                        type="button"
+                        onClick={() => setIsFrontmatterOpen(!isFrontmatterOpen)}
+                        title={isFrontmatterOpen ? "Collapse Frontmatter Editor" : "Open Frontmatter Editor"}
+                        className={`p-2 rounded-xl border transition-all flex items-center justify-center cursor-pointer ${
+                          isFrontmatterOpen
+                            ? "bg-purple-600/20 text-purple-300 border-purple-500/40"
+                            : "bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10"
+                        }`}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
               </div>
 
               {/* Render dynamic CD Wall view */}
@@ -1143,25 +1302,19 @@ export default class VisualCoversPlugin extends Plugin {
                 )}
               </div>
 
-              {/* Glass Tip Panel */}
-              <div className="mt-4 p-3 bg-white/[0.02] rounded-xl border border-white/5 flex gap-2 items-start text-xs text-gray-400">
-                <Info className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                <p>
-                  <strong className="text-white">Designer Tip:</strong> Hover on any squared CD card to pull outward the customizable, high-speed <strong>spinning dynamic black vinyl record</strong>! Click to edit its metadata.
-                </p>
-              </div>
+
             </div>
 
             {/* 3. Right Column: Obsidian Note Markdown Code Editor & Quick Art Generator */}
-            <div className="lg:col-span-3 flex flex-col gap-6">
+            {isFrontmatterOpen && (
+              <div className="lg:col-span-3 flex flex-col gap-6 animate-in fade-in slide-in-from-right-3 duration-300">
               
               {/* Note Metadata Properties Controller */}
               {selectedNote ? (
                 <div className="bg-[#111] border border-[#222] rounded-2xl p-4 flex flex-col gap-3">
                   <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                    <span className="text-[10px] font-bold tracking-widest text-[#a855f7] flex items-center gap-1">
-                      <Edit className="w-3.5 h-3.5" />
-                      FRONTMATTER EDITOR
+                    <span className="text-purple-400 flex items-center p-0.5 animate-pulse" title="Frontmatter Editor">
+                      <Edit className="w-4 h-4 text-purple-400" />
                     </span>
                     {savedSuccessMsg && (
                       <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-0.5 animate-pulse">
@@ -1172,7 +1325,7 @@ export default class VisualCoversPlugin extends Plugin {
 
                   <div className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-gray-400 mb-1">Disc Title</label>
+                      <label className="block text-gray-400 mb-1">Title</label>
                       <input
                         type="text"
                         value={selectedNote.frontmatter.title || ""}
@@ -1196,28 +1349,40 @@ export default class VisualCoversPlugin extends Plugin {
                       />
                     </div>
 
+                    {/* Per-Cover Custom Font Size */}
                     <div>
-                      <label className="block text-gray-400 mb-1">Subtitle / Release Info</label>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-gray-400">Cover Font Size</label>
+                        <span className="text-purple-400 font-mono font-medium">
+                          {selectedNote.frontmatter.fontSize || settings.defaultFontSize}px
+                          {selectedNote.frontmatter.fontSize ? " (Custom)" : " (Default)"}
+                        </span>
+                      </div>
                       <input
-                        type="text"
-                        value={selectedNote.frontmatter.subtitle || ""}
+                        type="range"
+                        min="10"
+                        max="80"
+                        value={selectedNote.frontmatter.fontSize || settings.defaultFontSize}
                         onChange={(e) => {
                           const currentProperties = selectedNote.content;
                           const hasCover = currentProperties.match(/^---\r?\n([\s\S]*?)\r?\n---/);
                           if (hasCover) {
                             let fmText = hasCover[1];
-                            if (fmText.includes("subtitle:")) {
-                              fmText = fmText.replace(/subtitle:\s*".*?"/g, `subtitle: "${e.target.value}"`);
-                              fmText = fmText.replace(/subtitle:\s*.*$/gm, `subtitle: "${e.target.value}"`);
+                            const val = e.target.value;
+                            if (fmText.includes("fontSize:")) {
+                              fmText = fmText.replace(/fontSize:\s*\d+/g, `fontSize: ${val}`);
+                              fmText = fmText.replace(/fontSize:\s*.*$/gm, `fontSize: ${val}`);
+                            } else if (fmText.includes("font_size:")) {
+                              fmText = fmText.replace(/font_size:\s*\d+/g, `fontSize: ${val}`);
+                              fmText = fmText.replace(/font_size:\s*.*$/gm, `fontSize: ${val}`);
                             } else {
-                              fmText += `\nsubtitle: "${e.target.value}"`;
+                              fmText += `\nfontSize: ${val}`;
                             }
                             const rebuilt = `---\n${fmText.trim()}\n---` + currentProperties.replace(/^---\r?\n([\s\S]*?)\r?\n---/, "");
                             handleUpdateNoteContent(rebuilt);
                           }
                         }}
-                        className="w-full bg-white/5 hover:bg-white/10 focus:bg-[#1a1a1a] focus:ring-1 focus:ring-purple-600 transition-all border border-white/10 rounded-lg px-3 py-2 text-white outline-none"
-                        placeholder="e.g. Symphonic Progressive Rock"
+                        className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500"
                       />
                     </div>
 
@@ -1275,65 +1440,66 @@ export default class VisualCoversPlugin extends Plugin {
                           </button>
                         )}
                       </div>
-                      <div className="grid grid-cols-4 gap-1">
-                        {COVER_PRESETS.map((preset, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => handleAssignCoverUrl(preset.url)}
-                            title={preset.name}
-                            className={`h-9 bg-cover bg-center rounded-md border text-[10px] font-semibold text-white/90 shadow transition-all ${
-                              selectedNote.frontmatter.cover === preset.url 
-                                ? "ring-2 ring-purple-500 border-white scale-95" 
-                                : "border-white/10 hover:border-white/30"
-                            }`}
-                            style={{ backgroundImage: `url(${preset.url})` }}
-                          />
-                        ))}
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {/* Hidden File Input */}
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleCustomImageUpload}
+                          accept="image/*"
+                          className="hidden"
+                          id="custom-cover-file-picker"
+                        />
+
+                        {Array.from({ length: 8 }).map((_, slotIdx) => {
+                          if (slotIdx === 1) {
+                            // File selector/Uploader button
+                            const isCurrentCustom = selectedNote.frontmatter.cover && !COVER_PRESETS.some(p => p.url === selectedNote.frontmatter.cover);
+                            return (
+                              <button
+                                key="uploader-slot"
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                title="Upload your own custom cover art"
+                                className={`h-9 relative flex flex-col items-center justify-center rounded-md border text-[9px] font-semibold transition-all border-dashed ${
+                                  isCurrentCustom
+                                    ? "bg-purple-600/20 border-purple-500 text-purple-300 ring-2 ring-purple-500 scale-95"
+                                    : "bg-white/[0.02] hover:bg-white/5 border-white/20 text-gray-400 hover:text-white"
+                                }`}
+                              >
+                                {isCurrentCustom ? (
+                                  <div className="absolute inset-0 rounded-md bg-cover bg-center overflow-hidden opacity-30" style={{ backgroundImage: `url(${selectedNote.frontmatter.cover})` }} />
+                                ) : null}
+                                <span className="relative z-10 font-bold text-center leading-none">Upload Cover</span>
+                                <span className="relative z-10 text-[7px] text-gray-500 block leading-tight mt-0.5">(Custom)</span>
+                              </button>
+                            );
+                          }
+
+                          // Get original preset: index is slotIdx if < 1 else slotIdx - 1
+                          const presetIdx = slotIdx < 1 ? slotIdx : slotIdx - 1;
+                          const preset = COVER_PRESETS[presetIdx];
+                          if (!preset) return null;
+
+                          return (
+                            <button
+                              key={presetIdx}
+                              type="button"
+                              onClick={() => handleAssignCoverUrl(preset.url)}
+                              title={preset.name}
+                              className={`h-9 bg-cover bg-center rounded-md border text-[10px] font-semibold text-white/90 shadow transition-all relative ${
+                                selectedNote.frontmatter.cover === preset.url 
+                                  ? "ring-2 ring-purple-500 border-white scale-95" 
+                                  : "border-white/10 hover:border-white/30"
+                              }`}
+                              style={{ backgroundImage: `url(${preset.url})` }}
+                            />
+                          );
+                        })}
                       </div>
                     </div>
 
-                    {/* Settings Controllers parameters */}
-                    <div className="border-t border-white/5 pt-3 mt-1 space-y-3">
-                      <span className="text-[10px] text-gray-500 uppercase font-mono block">Obsidian Settings Sync</span>
-                      
-                      {/* Font slider */}
-                      <div>
-                        <div className="flex justify-between text-[11px] text-gray-400 mb-1">
-                          <span>Grid Title Text Size</span>
-                          <span className="text-purple-400 font-mono">{settings.defaultFontSize}px</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="10"
-                          max="22"
-                          value={settings.defaultFontSize}
-                          onChange={(e) => setSettings({ ...settings, defaultFontSize: parseInt(e.target.value) })}
-                          className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                        />
-                      </div>
 
-                      {/* Animation switches */}
-                      <div className="flex items-center justify-between text-[11px] text-gray-400">
-                        <span>Black Vinyl sliding out on hover</span>
-                        <input
-                          type="checkbox"
-                          checked={settings.enableVinylAnimation}
-                          onChange={(e) => setSettings({ ...settings, enableVinylAnimation: e.target.checked })}
-                          className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-purple-600 cursor-pointer"
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between text-[11px] text-gray-400">
-                        <span>3D Cinema Hover Tilt tilt effect</span>
-                        <input
-                          type="checkbox"
-                          checked={settings.enable3DEffect}
-                          onChange={(e) => setSettings({ ...settings, enable3DEffect: e.target.checked })}
-                          className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-purple-600 cursor-pointer"
-                        />
-                      </div>
-                    </div>
                   </div>
                 </div>
               ) : (
@@ -1341,74 +1507,8 @@ export default class VisualCoversPlugin extends Plugin {
                   Select a Markdown file to configure parameters
                 </div>
               )}
-
-              {/* AI Co-Producer Brainstorm Widget */}
-              <div className="bg-[#111111] border border-purple-500/20 rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg shadow-purple-500/5">
-                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                  <Sparkles className="w-16 h-16 text-purple-500" />
-                </div>
-                
-                <h3 className="text-xs font-bold text-purple-400 flex items-center gap-1.5 uppercase font-display">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  AI Cover Art Creator
-                </h3>
-                
-                <p className="text-[11px] text-gray-400">
-                  Type sound descriptors (e.g., <span className="text-purple-300">Cozy Jazz Lounge</span> or <span className="text-purple-300">Cyberpunk Retro Synth</span>) to brainstorm custom aesthetic art patterns instantly!
-                </p>
-
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                    placeholder="Enter music genre descriptions..."
-                    className="flex-1 bg-white/5 hover:bg-white/10 focus:bg-[#181818] transition-all border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleGenerateCreativeCover}
-                    disabled={isGeneratingCover || !aiPrompt.trim()}
-                    className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg text-xs font-semibold hover:opacity-90 active:scale-95 transition-all text-center shrink-0 disabled:opacity-40 disabled:pointer-events-none"
-                  >
-                    Generate
-                  </button>
-                </div>
-
-                {/* Generator output simulated */}
-                {isGeneratingCover && (
-                  <div className="py-2 flex items-center justify-center gap-2 text-xs text-gray-400">
-                    <Disc className="w-4 h-4 text-purple-400 animate-spin" />
-                    <span>Brainstorming album concept...</span>
-                  </div>
-                )}
-
-                {aiCoverResult && (
-                  <div className="mt-1 p-2.5 bg-white/[0.03] rounded-xl border border-purple-500/10 space-y-2">
-                    <div className="flex gap-2.5">
-                      <div 
-                        className="w-12 h-12 bg-cover bg-center rounded-lg shadow border border-white/10 shrink-0" 
-                        style={{ backgroundImage: `url(${aiCoverResult.coverUrl})` }}
-                      />
-                      <div className="flex-1 min-w-0 text-xs">
-                        <h4 className="text-white font-medium truncate">{aiCoverResult.title}</h4>
-                        <p className="text-gray-400 text-[10px] truncate">{aiCoverResult.subtitle}</p>
-                        <p className="text-purple-400 text-[10px] font-mono mt-0.5 truncate uppercase">Preset: {aiCoverResult.gradient}</p>
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-gray-500 leading-relaxed italic">{aiCoverResult.vibeDescription}</p>
-
-                    <button
-                      type="button"
-                      onClick={applyAICoverToCurrentNote}
-                      className="w-full py-1 bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold rounded-md transition-all flex items-center justify-center gap-1"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Apply to Current Album Cover
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
+            )}
           </div>
         )}
 
