@@ -106,9 +106,9 @@ class CDCoverView extends ItemView {
     } else {
       const folder = this.app.vault.getAbstractFileByPath(this.folderPath);
       if (folder instanceof TFolder) {
-        // 遞迴遍歷或只搜尋第一層
-        this.app.vault.getFiles().forEach(file => {
-          if (file.parent && (file.parent.path === folder.path)) {
+        // Direct child traversal is highly optimized and instant even in huge vaults
+        folder.children.forEach(file => {
+          if (file instanceof TFile) {
             if (this.plugin.settings.filterMarkdownOnly && file.extension !== "md") {
               return;
             }
@@ -311,8 +311,8 @@ export default class CDCoverVisualizerPlugin extends Plugin {
       } else {
         const folder = this.app.vault.getAbstractFileByPath(targetFolderPath);
         if (folder instanceof TFolder) {
-          this.app.vault.getFiles().forEach(file => {
-            if (file.parent && file.parent.path === folder.path) {
+          folder.children.forEach(file => {
+            if (file instanceof TFile) {
               if (this.settings.filterMarkdownOnly && file.extension !== "md") return;
               files.push(file);
             }
